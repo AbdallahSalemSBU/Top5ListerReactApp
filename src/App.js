@@ -82,8 +82,6 @@ class App extends React.Component {
         this.setState(prevState => ({
             currentList: currentList
         }), () => {
-            // AN AFTER EFFECT IS THAT WE NEED TO MAKE SURE
-            // THE TRANSACTION STACK IS CLEARED
             let list = this.db.queryGetList(currentList.key);
             list.items[index] = newName;
             this.db.mutationUpdateList(list);
