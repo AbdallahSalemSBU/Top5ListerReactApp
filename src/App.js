@@ -71,6 +71,16 @@ class App extends React.Component {
             this.db.mutationCreateList(newList);
         });
     }
+
+    renameItem = (index, newName) => {
+        let currentList = this.state.currentList;
+        currentList.items[index] = newName;
+        this.setState({
+            currentList: currentList 
+        })
+    }
+
+
     renameList = (key, newName) => {
         let newKeyNamePairs = [...this.state.sessionData.keyNamePairs];
         // NOW GO THROUGH THE ARRAY AND FIND THE ONE TO RENAME
@@ -158,7 +168,8 @@ class App extends React.Component {
                     renameListCallback={this.renameList}
                 />
                 <Workspace
-                    currentList={this.state.currentList} />
+                    currentList={this.state.currentList}
+                    renameItemCallback={this.renameItem} />
                 <Statusbar 
                     currentList={this.state.currentList} />
                 <DeleteModal
