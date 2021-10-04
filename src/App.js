@@ -166,7 +166,7 @@ class App extends React.Component {
             // ANY AFTER EFFECTS?
         });
         let item = document.getElementById("close-button");
-        item.classList.remove("top5-button-disabled");
+        item.classList.replace("top5-button-disabled", "top5-button");
     }
     // THIS FUNCTION BEGINS THE PROCESS OF CLOSING THE CURRENT LIST
     closeCurrentList = () => {
@@ -177,8 +177,9 @@ class App extends React.Component {
         }), () => {
             // ANY AFTER EFFECTS?
         });
+        this.tps.clearAllTransactions();
         let item = document.getElementById("close-button");
-        item.classList.add("top5-button-disabled");
+        item.classList.replace("top5-button", "top5-button-disabled");
     }
     deleteList = () => {
         // SOMEHOW YOU ARE GOING TO HAVE TO FIGURE OUT
@@ -203,6 +204,7 @@ class App extends React.Component {
             <div id="app-root">
                 <Banner 
                     title='Top 5 Lister'
+                    tps={this.tps}
                     closeCallback={this.closeCurrentList}
                     undoCallback={this.tps.undoTransaction.bind(this.tps)}
                     redoCallback={this.tps.doTransaction.bind(this.tps)} />
