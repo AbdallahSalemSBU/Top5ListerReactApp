@@ -38,11 +38,42 @@ export default class ItemCard extends React.Component {
         this.handleToggleEdit();
     }
 
-    handleToggleDrag = (event) =>{
-        console.log("dragging");
-        /*this.setState({
-            dragActive: !this.state.dragActive
-        });*/
+    handleDragOver = (event) =>{
+        event.preventDefault();
+        //event.stopPropagation();
+        let item = document.getElementById("item-" + this.props.index);
+        item.classList.add("top5-item-dragged-to");
+        this.setState({
+            dragActive: true
+        });
+    }
+
+    handleDragLeave = (event) => {
+        //event.preventDefault();
+        let item = document.getElementById("item-" + this.props.index);
+        item.classList.remove("top5-item-dragged-to");
+        this.setState({
+            dragActive: false
+        });
+    }
+
+    handleDragStart = (event) =>{
+        //event.preventDefault();
+        event.dataTransfer.setData('text/plain', this.props.index);
+        console.log("You are dragging "+ this.props.index);
+    }
+
+    handleDragDrop = (event) =>{
+        event.preventDefault();
+        event.stopPropagation();
+        let dragged = event.dataTransfer.getData('text/plain');
+        console.log("You have dragged " + dragged + " to " + this.props.index);
+        this.props.moveItemCallback(dragged, this.props.index);
+        let item = document.getElementById("item-" + this.props.index);
+        item.classList.remove("top5-item-dragged-to");
+        this.setState({
+            dragActive: false
+        });
     }
 
 
@@ -66,17 +97,17 @@ export default class ItemCard extends React.Component {
         }
 
         else{    
-            let selectClass = "top5-item";
-                if (this.dragActive) {
-                    selectClass = "top5-item-dragged-to";
-                }
+            let selectClass = this.dragActive ? "top5-item-dragged-to" : "top5-item";
             return (
                 <div
                     id={'item-' + index}
                     key={'item-' + index}
                     draggable = {true}
                     onClick={this.handleClick}
-                    onDragOver={this.handleToggleDrag}
+                    onDragOver={this.handleDragOver}
+                    onDragStart={this.handleDragStart}
+                    onDragLeave={this.handleDragLeave}
+                    onDrop={this.handleDragDrop}
                     className={selectClass}>
                     <span
                         id={'top5-item-' + index}

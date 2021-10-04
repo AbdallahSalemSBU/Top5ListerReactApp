@@ -72,6 +72,22 @@ class App extends React.Component {
         });
     }
 
+    moveItem = (oldIndex, newIndex) => {
+        let currentList = this.state.currentList;
+        currentList.items.splice(newIndex, 0, currentList.items.splice(oldIndex, 1)[0]);
+        this.setState({
+            currentList: currentList
+        })
+
+        this.setState(prevState => ({
+            currentList: currentList
+        }), () => {
+            let list = this.db.queryGetList(currentList.key);
+            list.items.splice(newIndex, 0, list.items.splice(oldIndex, 1)[0]);
+            this.db.mutationUpdateList(list);
+        });
+    }
+
     renameItem = (index, newName) => {
         let currentList = this.state.currentList;
         currentList.items[index] = newName;
@@ -177,7 +193,8 @@ class App extends React.Component {
                 />
                 <Workspace
                     currentList={this.state.currentList}
-                    renameItemCallback={this.renameItem} />
+                    renameItemCallback={this.renameItem}
+                    moveItemCallback={this.moveItem} />
                 <Statusbar 
                     currentList={this.state.currentList} />
                 <DeleteModal
