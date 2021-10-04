@@ -3,6 +3,9 @@ import './App.css';
 
 // IMPORT DATA MANAGEMENT AND TRANSACTION STUFF
 import DBManager from './db/DBManager';
+import jsTPS from './transactions/jsTPS';
+import ChangeItem_Transaction from './transactions/ChangeItem_Transaction';
+import MoveItem_Transaction from './transactions/MoveItem_Transaction';
 
 // THESE ARE OUR REACT COMPONENTS
 import DeleteModal from './components/DeleteModal';
@@ -17,6 +20,8 @@ class App extends React.Component {
 
         // THIS WILL TALK TO LOCAL STORAGE
         this.db = new DBManager();
+
+        this.tps = new jsTPS();
 
         // GET THE SESSION DATA FROM OUR DATA MANAGER
         let loadedSessionData = this.db.queryGetSessionData();
@@ -72,6 +77,11 @@ class App extends React.Component {
         });
     }
 
+    addMoveItemTransaction = (oldIndex, newIndex) => {
+        let transaction =  new MoveItem_Transaction(this, oldIndex, newIndex);
+        this.tps.addTransaction(transaction);
+    }
+
     moveItem = (oldIndex, newIndex) => {
         let currentList = this.state.currentList;
         currentList.items.splice(newIndex, 0, currentList.items.splice(oldIndex, 1)[0]);
@@ -86,6 +96,14 @@ class App extends React.Component {
             list.items.splice(newIndex, 0, list.items.splice(oldIndex, 1)[0]);
             this.db.mutationUpdateList(list);
         });
+    }
+
+    addChangeItemTransaction = (id, newText) => {
+        // GET THE CURRENT TEXT
+        let currentList = this.state.currentList;
+        let oldText = currentList.items[id];
+        let transaction = new ChangeItem_Transaction(this, id, oldText, newText);
+        this.tps.addTransaction(transaction);
     }
 
     renameItem = (index, newName) => {
@@ -147,6 +165,8 @@ class App extends React.Component {
         }), () => {
             // ANY AFTER EFFECTS?
         });
+        let item = document.getElementById("close-button");
+        item.classList.remove("top5-button-disabled");
     }
     // THIS FUNCTION BEGINS THE PROCESS OF CLOSING THE CURRENT LIST
     closeCurrentList = () => {
@@ -157,6 +177,8 @@ class App extends React.Component {
         }), () => {
             // ANY AFTER EFFECTS?
         });
+        let item = document.getElementById("close-button");
+        item.classList.add("top5-button-disabled");
     }
     deleteList = () => {
         // SOMEHOW YOU ARE GOING TO HAVE TO FIGURE OUT
@@ -181,7 +203,9 @@ class App extends React.Component {
             <div id="app-root">
                 <Banner 
                     title='Top 5 Lister'
-                    closeCallback={this.closeCurrentList} />
+                    closeCallback={this.closeCurrentList}
+                    undoCallback={this.tps.undoTransaction.bind(this.tps)}
+                    redoCallback={this.tps.doTransaction.bind(this.tps)} />
                 <Sidebar
                     heading='Your Lists'
                     currentList={this.state.currentList}
@@ -193,8 +217,8 @@ class App extends React.Component {
                 />
                 <Workspace
                     currentList={this.state.currentList}
-                    renameItemCallback={this.renameItem}
-                    moveItemCallback={this.moveItem} />
+                    renameItemCallback={this.addChangeItemTransaction}
+                    moveItemCallback={this.addMoveItemTransaction} />
                 <Statusbar 
                     currentList={this.state.currentList} />
                 <DeleteModal

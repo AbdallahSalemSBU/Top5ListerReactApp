@@ -76,8 +76,6 @@ export default class ItemCard extends React.Component {
         });
     }
 
-
-
     render() {
         const { index,
         name } = this.props;
