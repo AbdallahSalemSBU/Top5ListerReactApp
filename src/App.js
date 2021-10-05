@@ -28,6 +28,7 @@ class App extends React.Component {
 
         // SETUP THE INITIAL STATE
         this.state = {
+            listKeyPairMarkedForDeletion: null,
             currentList : null,
             sessionData : loadedSessionData
         }
@@ -172,7 +173,7 @@ class App extends React.Component {
     closeCurrentList = () => {
         this.setState(prevState => ({
             currentList: null,
-            listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
+            //listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
             sessionData: this.state.sessionData
         }), () => {
             // ANY AFTER EFFECTS?
@@ -181,11 +182,15 @@ class App extends React.Component {
         let item = document.getElementById("close-button");
         item.classList.replace("top5-button", "top5-button-disabled");
     }
-    deleteList = () => {
+    deleteList = (pair) => {
         // SOMEHOW YOU ARE GOING TO HAVE TO FIGURE OUT
         // WHICH LIST IT IS THAT THE USER WANTS TO
         // DELETE AND MAKE THAT CONNECTION SO THAT THE
         // NAME PROPERLY DISPLAYS INSIDE THE MODAL
+        this.setState({
+            listKeyPairMarkedForDeletion : pair
+        })
+        console.log(this.state.listKeyPairMarkedForDeletion);
         this.showDeleteListModal();
     }
     // THIS FUNCTION SHOWS THE MODAL FOR PROMPTING THE USER
@@ -199,6 +204,18 @@ class App extends React.Component {
         let modal = document.getElementById("delete-modal");
         modal.classList.remove("is-visible");
     }
+    confirmDeleteList() {
+        this.closeCurrentList();
+        let index = this.state.sessionData.keyNamePairs.indexOf(this.state.listKeyPairMarkedForDeletion);
+        this.state.sessionData.keyNamePairs.splice(index, 1);
+        //this.db.mutationDeleteList(this.state.listKeyPairMarkedForDeletion.key);
+        this.setState({
+            sessionData : this.state.sessionData
+        })
+        this.db.mutationUpdateSessionData(this.state.sessionData);
+        this.hideDeleteListModal();
+    }
+
     render() {
         return (
             <div id="app-root">
@@ -224,7 +241,9 @@ class App extends React.Component {
                 <Statusbar 
                     currentList={this.state.currentList} />
                 <DeleteModal
+                    listKeyPair={this.state.listKeyPairMarkedForDeletion}
                     hideDeleteListModalCallback={this.hideDeleteListModal}
+                    deleteListCallback={this.confirmDeleteList.bind(this)}
                 />
             </div>
         );
