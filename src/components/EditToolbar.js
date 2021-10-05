@@ -2,6 +2,20 @@ import React from "react";
 
 export default class EditToolbar extends React.Component {
     render() {
+        window.addEventListener('keydown', (event) => {
+            let undoReady= false;
+            if(event.code === "ControlLeft" || "ControlRight"){
+                console.log("You pressed Control");
+                undoReady = true;
+            }
+            if(undoReady && event.code === "KeyZ"){
+                this.props.undoCallback();
+            }
+            else if(undoReady && event.code === "KeyY"){
+                this.props.redoCallback();
+            }
+            this.forceUpdate();
+        });
         let undoClass = this.props.tps.hasTransactionToUndo() ? "top5-button" : "top5-button-disabled";
         let redoClass = this.props.tps.hasTransactionToRedo() ? "top5-button" : "top5-button-disabled";
         return (

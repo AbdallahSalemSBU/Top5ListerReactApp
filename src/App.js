@@ -190,7 +190,6 @@ class App extends React.Component {
         this.setState({
             listKeyPairMarkedForDeletion : pair
         })
-        console.log(this.state.listKeyPairMarkedForDeletion);
         this.showDeleteListModal();
     }
     // THIS FUNCTION SHOWS THE MODAL FOR PROMPTING THE USER
@@ -208,7 +207,6 @@ class App extends React.Component {
         this.closeCurrentList();
         let index = this.state.sessionData.keyNamePairs.indexOf(this.state.listKeyPairMarkedForDeletion);
         this.state.sessionData.keyNamePairs.splice(index, 1);
-        //this.db.mutationDeleteList(this.state.listKeyPairMarkedForDeletion.key);
         this.setState({
             sessionData : this.state.sessionData
         })
